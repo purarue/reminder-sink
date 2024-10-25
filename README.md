@@ -10,7 +10,7 @@ Probably easiest explained with some examples of scripts this might run:
 # remind me to listen to a new album once a week
 
 # interfaces with my spreadsheet where I track my albums
-# https://github.com/seanbreckenridge/albums
+# https://github.com/purarue/albums
 LISTENCOUNT="$(hpi query -r 1w my.nextalbums.history | jq 'length')" || exit 1
 
 if [[ "${LISTENCOUNT}" == '0' ]]; then
@@ -63,11 +63,11 @@ get interrupted or feel like I have to 'snooze'/delay the habit.
 I also don't feel too horrible if there's a number there for a couple hours, I get
 around to the task eventually
 
-I generally track my habits with my `Self` type using [`ttally`](https://github.com/seanbreckenridge/ttally),
+I generally track my habits with my `Self` type using [`ttally`](https://github.com/purarue/ttally),
 and use [`i3blocks`](https://github.com/vivien/i3blocks) for my status bar. [The block for
 `reminder-sink`](https://sean.fish/d/b-reminder-sink?redirect) looks like this:
 
-![image](https://github.com/seanbreckenridge/reminder-sink/assets/7804791/0bc9706d-419c-41fe-91dc-217893ba2475)
+![image](https://github.com/purarue/reminder-sink/assets/7804791/0bc9706d-419c-41fe-91dc-217893ba2475)
 
 ```bash
 #!/usr/bin/env bash
@@ -93,14 +93,14 @@ fi
 
 Or just run `reminder-sink run` when you start up a new terminal or something, this is very flexible
 
-You can see some of my other reminder-sink jobs [in my dotfiles](https://github.com/seanbreckenridge/dotfiles/tree/master/.local/scripts/reminder-sink), but I use this for stuff like:
+You can see some of my other reminder-sink jobs [in my dotfiles](https://github.com/purarue/dotfiles/tree/master/.local/scripts/reminder-sink), but I use this for stuff like:
 
 - reminding me to log my weight at least once a week
-- making sure I drink enough water (using [`ttally`](https://github.com/seanbreckenridge/ttally))
+- making sure I drink enough water (using [`ttally`](https://github.com/purarue/ttally))
 - listen to album once a week (by using my [spreadsheet](https://sean.fish/s/albums))
 - tracking physical activity
 - remind me to re-fill on medication when it runs out
-- watch something on my movie/tv show backlog once every couple days (this gets tracked automatically by my [`mpv-history-daemon`](https://github.com/seanbreckenridge/mpv-history-daemon))
+- watch something on my movie/tv show backlog once every couple days (this gets tracked automatically by my [`mpv-history-daemon`](https://github.com/purarue/mpv-history-daemon))
 
 ## Usage
 
@@ -136,7 +136,7 @@ Commands:
   silence  temporarily silence a reminder
   test     test a script
 
-  See https://github.com/seanbreckenridge/reminder-sink for more information
+  See https://github.com/purarue/reminder-sink for more information
 ```
 
 This uses the shebang of the script (e.g. `#!/usr/bin/env bash` or `#!/usr/bin/python3`) to determine
@@ -146,14 +146,14 @@ what to run the file with. If it can't detect properly, it uses `bash` (you can 
 
 ```
 $ reminder-sink list
-Script(path=PosixPath('/home/sean/data/reminder-sink/self_type_common.py'), enabled=False)
-Script(path=PosixPath('/home/sean/data/reminder-sink/physical_activity.enabled'), enabled=True)
-Script(path=PosixPath('/home/sean/data/reminder-sink/mal_sources'), enabled=False)
-Script(path=PosixPath('/home/sean/.local/scripts/reminder-sink/flipflop'), enabled=True)
-Script(path=PosixPath('/home/sean/.local/scripts/reminder-sink/weight'), enabled=True)
-Script(path=PosixPath('/home/sean/.local/scripts/reminder-sink/listen_to_album'), enabled=True)
-Script(path=PosixPath('/home/sean/.local/scripts/reminder-sink/food'), enabled=True)
-Script(path=PosixPath('/home/sean/.local/scripts/reminder-sink/water'), enabled=True)
+Script(path=PosixPath('/home/username/data/reminder-sink/self_type_common.py'), enabled=False)
+Script(path=PosixPath('/home/username/data/reminder-sink/physical_activity.enabled'), enabled=True)
+Script(path=PosixPath('/home/username/data/reminder-sink/mal_sources'), enabled=False)
+Script(path=PosixPath('/home/username/.local/scripts/reminder-sink/flipflop'), enabled=True)
+Script(path=PosixPath('/home/username/.local/scripts/reminder-sink/weight'), enabled=True)
+Script(path=PosixPath('/home/username/.local/scripts/reminder-sink/listen_to_album'), enabled=True)
+Script(path=PosixPath('/home/username/.local/scripts/reminder-sink/food'), enabled=True)
+Script(path=PosixPath('/home/username/.local/scripts/reminder-sink/water'), enabled=True)
 ```
 
 This runs the scripts in parallel, with the number of threads equal to the number of cores you have available:
@@ -161,18 +161,18 @@ This runs the scripts in parallel, with the number of threads equal to the numbe
 ```
 $ reminder-sink --debug run
 2023-10-06 00:54:28,197 DEBUG - reminder-sink: Running scripts with 16 threads
-2023-10-06 00:54:28,197 DEBUG - reminder-sink: Searching /home/sean/data/reminder-sink
+2023-10-06 00:54:28,197 DEBUG - reminder-sink: Searching /home/username/data/reminder-sink
 2023-10-06 00:54:28,197 DEBUG - self_type_common: not enabled
-2023-10-06 00:54:28,197 DEBUG - physical_activity: Starting '/usr/bin/env bash /home/sean/data/reminder-sink/physical_activity.enabled'
-2023-10-06 00:54:28,199 DEBUG - mal_sources: Starting '/usr/bin/env bash /home/sean/data/reminder-sink/mal_sources'
-2023-10-06 00:54:28,199 DEBUG - reminder-sink: finished searching /home/sean/data/reminder-sink
-2023-10-06 00:54:28,199 DEBUG - reminder-sink: Searching /home/sean/.local/scripts/reminder-sink
-2023-10-06 00:54:28,200 DEBUG - flipflop: Starting '/usr/bin/env bash /home/sean/.local/scripts/reminder-sink/flipflop'
-2023-10-06 00:54:28,201 DEBUG - weight: Starting '/usr/bin/env bash /home/sean/.local/scripts/reminder-sink/weight'
-2023-10-06 00:54:28,203 DEBUG - listen_to_album: Starting '/usr/bin/env bash /home/sean/.local/scripts/reminder-sink/listen_to_album'
-2023-10-06 00:54:28,203 DEBUG - food: Starting '/usr/bin/env bash /home/sean/.local/scripts/reminder-sink/food'
-2023-10-06 00:54:28,204 DEBUG - reminder-sink: finished searching /home/sean/.local/scripts/reminder-sink
-2023-10-06 00:54:28,204 DEBUG - water: Starting '/usr/bin/env bash /home/sean/.local/scripts/reminder-sink/water'
+2023-10-06 00:54:28,197 DEBUG - physical_activity: Starting '/usr/bin/env bash /home/username/data/reminder-sink/physical_activity.enabled'
+2023-10-06 00:54:28,199 DEBUG - mal_sources: Starting '/usr/bin/env bash /home/username/data/reminder-sink/mal_sources'
+2023-10-06 00:54:28,199 DEBUG - reminder-sink: finished searching /home/username/data/reminder-sink
+2023-10-06 00:54:28,199 DEBUG - reminder-sink: Searching /home/username/.local/scripts/reminder-sink
+2023-10-06 00:54:28,200 DEBUG - flipflop: Starting '/usr/bin/env bash /home/username/.local/scripts/reminder-sink/flipflop'
+2023-10-06 00:54:28,201 DEBUG - weight: Starting '/usr/bin/env bash /home/username/.local/scripts/reminder-sink/weight'
+2023-10-06 00:54:28,203 DEBUG - listen_to_album: Starting '/usr/bin/env bash /home/username/.local/scripts/reminder-sink/listen_to_album'
+2023-10-06 00:54:28,203 DEBUG - food: Starting '/usr/bin/env bash /home/username/.local/scripts/reminder-sink/food'
+2023-10-06 00:54:28,204 DEBUG - reminder-sink: finished searching /home/username/.local/scripts/reminder-sink
+2023-10-06 00:54:28,204 DEBUG - water: Starting '/usr/bin/env bash /home/username/.local/scripts/reminder-sink/water'
 2023-10-06 00:54:28,218 DEBUG - mal_sources: (took 0.01922) with exit code 0 and output ''
 2023-10-06 00:54:28,306 DEBUG - flipflop: (took 0.10657) with exit code 0 and output ''
 2023-10-06 00:54:28,319 DEBUG - physical_activity: (took 0.12172) with exit code 0 and output ''
@@ -207,7 +207,7 @@ Commands:
 
 If you want to debug the current silenced status, pass debug like `reminder-sink --debug silence list`
 
-I have a binding in my [i3 blocklet](https://sean.fish/d/b-reminder-sink?redirect) that lets me quickly ignore an active reminder using [`fzf`](https://github.com/junegunn/fzf) and [`evry duration`](https://github.com/seanbreckenridge/evry#duration) to allow me to pick an active reminder and enter a [human readable duration](https://github.com/seanbreckenridge/evry#duration). See [`reminder-sink-silence`](https://sean.fish/d/reminder-sink-silence?redirect)
+I have a binding in my [i3 blocklet](https://sean.fish/d/b-reminder-sink?redirect) that lets me quickly ignore an active reminder using [`fzf`](https://github.com/junegunn/fzf) and [`evry duration`](https://github.com/purarue/evry#duration) to allow me to pick an active reminder and enter a [human readable duration](https://github.com/purarue/evry#duration). See [`reminder-sink-silence`](https://sean.fish/d/reminder-sink-silence?redirect)
 
 ## Installation
 
@@ -222,7 +222,7 @@ pip install reminder-sink
 ### Tests
 
 ```bash
-git clone 'https://github.com/seanbreckenridge/reminder-sink'
+git clone 'https://github.com/purarue/reminder-sink'
 cd ./reminder-sink
 pip install '.[testing]'
 flake8 ./reminder_sink

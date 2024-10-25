@@ -277,7 +277,7 @@ FORMAT = "%(asctime)s %(levelname)s - %(message)s"
 @click.group(
     help=USAGE,
     context_settings={"help_option_names": ["-h", "--help"]},
-    epilog="See https://github.com/seanbreckenridge/reminder-sink for more information",
+    epilog="See https://github.com/purarue/reminder-sink for more information",
 )
 @click.option(
     "-d",
