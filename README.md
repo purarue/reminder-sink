@@ -20,7 +20,7 @@ else
 fi
 ```
 
-[`flipflop`](https://sean.fish/d/flipflop.py?redirect) is a tool which lets me toggle todos for things that I need to do often. Think like: re-add an energy bar to my bag, refill medication.
+[`flipflop`](https://purarue.xyz/d/flipflop.py?redirect) is a tool which lets me toggle todos for things that I need to do often. Think like: re-add an energy bar to my bag, refill medication.
 
 I'll often run `flipflop` when I'm away from my computer using [termux](https://termux.dev/en/) on my phone. The data for that is then synced to my computer with [syncthing](https://syncthing.net/)
 
@@ -65,7 +65,7 @@ around to the task eventually
 
 I generally track my habits with my `Self` type using [`ttally`](https://github.com/purarue/ttally),
 and use [`i3blocks`](https://github.com/vivien/i3blocks) for my status bar. [The block for
-`reminder-sink`](https://sean.fish/d/b-reminder-sink?redirect) looks like this:
+`reminder-sink`](https://purarue.xyz/d/b-reminder-sink?redirect) looks like this:
 
 ![image](https://github.com/purarue/reminder-sink/assets/7804791/0bc9706d-419c-41fe-91dc-217893ba2475)
 
@@ -97,7 +97,7 @@ You can see some of my other reminder-sink jobs [in my dotfiles](https://github.
 
 - reminding me to log my weight at least once a week
 - making sure I drink enough water (using [`ttally`](https://github.com/purarue/ttally))
-- listen to album once a week (by using my [spreadsheet](https://sean.fish/s/albums))
+- listen to album once a week (by using my [spreadsheet](https://purarue.xyz/s/albums))
 - tracking physical activity
 - remind me to re-fill on medication when it runs out
 - watch something on my movie/tv show backlog once every couple days (this gets tracked automatically by my [`mpv-history-daemon`](https://github.com/purarue/mpv-history-daemon))
@@ -207,7 +207,7 @@ Commands:
 
 If you want to debug the current silenced status, pass debug like `reminder-sink --debug silence list`
 
-I have a binding in my [i3 blocklet](https://sean.fish/d/b-reminder-sink?redirect) that lets me quickly ignore an active reminder using [`fzf`](https://github.com/junegunn/fzf) and [`evry duration`](https://github.com/purarue/evry#duration) to allow me to pick an active reminder and enter a [human readable duration](https://github.com/purarue/evry#duration). See [`reminder-sink-silence`](https://sean.fish/d/reminder-sink-silence?redirect)
+I have a binding in my [i3 blocklet](https://purarue.xyz/d/b-reminder-sink?redirect) that lets me quickly ignore an active reminder using [`fzf`](https://github.com/junegunn/fzf) and [`evry duration`](https://github.com/purarue/evry#duration) to allow me to pick an active reminder and enter a [human readable duration](https://github.com/purarue/evry#duration). See [`reminder-sink-silence`](https://purarue.xyz/d/reminder-sink-silence?redirect)
 
 ## Installation
 
