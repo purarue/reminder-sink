@@ -4,6 +4,7 @@ import os
 import json
 import time
 import fnmatch
+import shutil
 import subprocess
 import shlex
 import logging
@@ -493,6 +494,31 @@ def _silence_list() -> None:
     sf = SilentFile(Path(silent_file_location))
     for line in sf.load():
         click.echo(line)
+
+
+def get_editor_path() -> str:
+    """
+    returns editor specified by $EDITOR, $VISUAL, else uses a list of fallbacks
+    """
+    editors = ["nano", "nvim", "vim"]
+    for envvar in ("EDITOR", "VISUAL"):
+        if envvar in os.environ:
+            editors.insert(0, os.environ[envvar])
+    for editor in editors:
+        if location := shutil.which(editor):
+            return location
+    else:
+        raise RuntimeError(
+            "No editor found, please set the EDITOR or VISUAL environment variable"
+        )
+
+
+@_silence.command(name="edit", short_help="edit silenced reminder file")
+def _silence_edit() -> None:
+    """
+    Edit the file which contains the silenced reminders in your editor
+    """
+    subprocess.call([get_editor_path(), str(silent_file_location)])
 
 
 @_silence.command(name="reset", short_help="reset all silenced reminders")
