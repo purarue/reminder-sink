@@ -109,6 +109,8 @@ class SilentFile(NamedTuple):
                     logging.debug(f"active silencer: {repr(active)}")
                     yield active
 
+    # silenced does not include all lines in the file, just
+    # the ones which are active (that have not expired yet)
     def autoprune(self, *, silenced: List[str]) -> None:
         # if there are items in the file that have expired, skip truncating
         if len(silenced) > 0:
@@ -122,11 +124,13 @@ class SilentFile(NamedTuple):
             return
 
         contents = self.file.read_text()
+        # if the user left it there and its empty, leave it
         if contents.strip() == "":
             logging.debug(f"{self.file} is empty, skipping auto-prune")
             return
 
-        logging.debug(f"{self.file} is not empty, deleting file")
+        # otherwise, remove it
+        logging.debug(f"{self.file} has no active silencers, removing file")
         self.file.unlink()
 
     def add_to_file(self, name: str, duration: int) -> None:
