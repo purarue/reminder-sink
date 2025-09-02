@@ -323,6 +323,9 @@ OutputFormat = Literal["repr", "path", "json"]
     show_default=True,
 )
 def _list(output_format: OutputFormat, enabled: bool, exclude: Sequence[str]) -> None:
+    """
+    List all scripts found in REMINDER_SINK_PATH
+    """
     scripts = list(find_execs(list(exclude)))
     if enabled:
         scripts = list(filter(lambda s: s.enabled, scripts))
@@ -344,6 +347,9 @@ def _list(output_format: OutputFormat, enabled: bool, exclude: Sequence[str]) ->
 @main.command(short_help="test a script", name="test")
 @click.argument("SCRIPT", type=click.Path(exists=True, dir_okay=False))
 def _test(script: str) -> None:
+    """
+    Tests a script by running it once and printing the output
+    """
     click.echo(f"Testing {script}", err=True)
     logging.basicConfig(level=logging.DEBUG, format=FORMAT)
     name, exitcode, output = Script(path=Path(script), enabled=True).run()
