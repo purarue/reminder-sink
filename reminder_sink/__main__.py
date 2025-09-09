@@ -129,9 +129,11 @@ class SilentFile(NamedTuple):
             logging.debug(f"{self.file} is empty, skipping auto-prune")
             return
 
-        # otherwise, remove it
-        logging.debug(f"{self.file} has no active silencers, removing file")
-        self.file.unlink()
+        # instead of unlinking, we should just write an empty file.
+        # it doesn't change much for this (just the read of the empty file),
+        # but makes things like syncing changes using syncthing/rsync more consistent
+        logging.debug(f"{self.file} has no active silencers, truncating file")
+        self.file.write_bytes(b"")
 
     def add_to_file(self, name: str, duration: int) -> None:
         if ":" in name:
@@ -548,8 +550,8 @@ def _silence_reset(if_expired: bool) -> None:
         silenced = list(sf.load())
         sf.autoprune(silenced=silenced)
     else:
-        if sf.file.exists():
-            sf.file.unlink()
+        # write an empty file
+        sf.file.write_bytes(b"")
 
 
 @_silence.command(name="file", short_help="print location of silenced reminders file")
