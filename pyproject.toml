@@ -1,6 +1,6 @@
 [project]
 name = "reminder_sink"
-version = "0.1.1"
+version = "0.1.2"
 description = "A unobtrusive, scriptable reminder/habit/todo task-runner"
 readme = "README.md"
 license = "MIT"
