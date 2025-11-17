@@ -94,7 +94,9 @@ def silenced_line_is_active(line: str, curtime: int) -> Optional[str]:
 class SilentFile(NamedTuple):
     file: Path
 
-    def __contains__(self, /, name: str) -> bool:
+    def __contains__(self, /, name: object) -> bool:
+        if not isinstance(name, str):
+            raise TypeError(f"Expected str, got {type(name).__name__}")
         return name in self.load()
 
     def load(self) -> Iterator[str]:
