@@ -1,14 +1,8 @@
 from __future__ import annotations
 import sys
 import os
-import json
 import time
-import fnmatch
-import shutil
-import subprocess
-import shlex
 import logging
-from datetime import datetime
 from pathlib import Path
 from typing import (
     Sequence,
@@ -88,6 +82,8 @@ def silenced_line_is_active(line: str, curtime: int) -> Optional[str]:
         logging.warning(f"Failed to parse integer from line: {line}")
         return None
     if curtime > expired_at:
+        from datetime import datetime
+
         logging.debug(
             f"{match} expired at {expired_at} ({datetime.fromtimestamp(expired_at)}), skipping..."
         )
@@ -146,6 +142,8 @@ class SilentFile(NamedTuple):
 
     @staticmethod
     def is_silenced(name: str, *, silenced: List[str]) -> bool:
+        import fnmatch
+
         return any(fnmatch.fnmatch(name, active) for active in silenced)
 
 
@@ -171,6 +169,9 @@ class Script(NamedTuple):
         return None
 
     def run(self) -> Result:
+        import shlex
+        import subprocess
+
         name = self.name
         start = time.perf_counter()
         interp = self.detect_shebang() or INTERPRETER
@@ -201,6 +202,8 @@ def script_is_enabled(path: Path) -> bool:
 
 
 def find_execs(exclude: List[str]) -> Iterable[Script]:
+    import fnmatch
+
     dirs = os.environ.get("REMINDER_SINK_PATH")
     if not dirs:
         click.echo(
@@ -224,6 +227,7 @@ def find_execs(exclude: List[str]) -> Iterable[Script]:
                 continue
             abspath_f = Path(os.path.abspath(os.path.join(d, file)))
             for pattern in exclude:
+
                 if fnmatch.fnmatch(str(abspath_f), pattern):
                     logging.debug(f"reminder-sink: matched {pattern}, skipping {file}")
                     break
@@ -340,6 +344,8 @@ def _list(output_format: OutputFormat, enabled: bool, exclude: Sequence[str]) ->
                 click.echo(str(s))
 
             case "json":
+                import json
+
                 click.echo(json.dumps({"path": str(s.path), "enabled": s.enabled}))
 
             case format:
@@ -512,6 +518,8 @@ def get_editor_path() -> str:
     """
     returns editor specified by $EDITOR, $VISUAL, else uses a list of fallbacks
     """
+    import shutil
+
     editors = ["nano", "nvim", "vim"]
     for envvar in ("EDITOR", "VISUAL"):
         if envvar in os.environ:
@@ -530,6 +538,8 @@ def _silence_edit() -> None:
     """
     Edit the file which contains the silenced reminders in your editor
     """
+    import subprocess
+
     subprocess.call([get_editor_path(), str(silent_file_location)])
 
 
