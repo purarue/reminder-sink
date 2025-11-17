@@ -4,11 +4,10 @@ import os
 import time
 import logging
 from pathlib import Path
+from datetime import datetime
 from typing import (
     TextIO,
     NamedTuple,
-    Optional,
-    List,
     Literal,
     get_args,
 )
@@ -63,7 +62,7 @@ if "REMINDER_SINK_SILENT_FILE" in os.environ:
 silent_file_location = silent_file_location.expanduser().absolute()
 
 
-def silenced_line_is_active(line: str, curtime: int) -> str | None:
+def silenced_line_is_active(line: str, curtime: int) -> tuple[str, datetime] | None:
     """
     parses a line that looks like:
 
@@ -80,13 +79,11 @@ def silenced_line_is_active(line: str, curtime: int) -> str | None:
         logging.warning(f"Failed to parse integer from line: {line}")
         return None
     if curtime > expired_at:
-        from datetime import datetime
-
         logging.debug(
             f"{match} expired at {expired_at} ({datetime.fromtimestamp(expired_at)}), skipping..."
         )
         return None
-    return match
+    return match, datetime.fromtimestamp(expired_at)
 
 
 class SilentFile(NamedTuple):
@@ -97,7 +94,7 @@ class SilentFile(NamedTuple):
             raise TypeError(f"Expected str, got {type(name).__name__}")
         return name in self.load()
 
-    def load(self) -> Iterator[str]:
+    def _load_data(self) -> Iterator[tuple[str, datetime]]:
         if not self.file.exists():
             logging.debug(f"{self.file} does not exist, skipping SilentFile load")
             return
@@ -105,8 +102,24 @@ class SilentFile(NamedTuple):
         for line in self.file.open("r"):
             if ls := line.strip():
                 if active := silenced_line_is_active(ls, curtime):
-                    logging.debug(f"active silencer: {repr(active)}")
+                    logging.debug(
+                        f"active silencer: {repr(active[0])} till {active[1]}"
+                    )
                     yield active
+
+    def _load_map(self) -> dict[str, datetime]:
+        ret: dict[str, datetime] = {}
+        for item, expires_at in self._load_data():
+            if item in ret:
+                if expires_at > ret[item]:
+                    ret[item] = expires_at
+            else:
+                ret[item] = expires_at
+        return ret
+
+    def load(self) -> Iterator[str]:
+        for item, _ in self._load_data():
+            yield item
 
     # silenced does not include all lines in the file, just
     # the ones which are active (that have not expired yet)
