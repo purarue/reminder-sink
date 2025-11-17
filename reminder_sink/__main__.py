@@ -5,16 +5,14 @@ import time
 import logging
 from pathlib import Path
 from typing import (
-    Sequence,
     TextIO,
-    Iterable,
     NamedTuple,
     Optional,
-    Iterator,
     List,
     Literal,
     get_args,
 )
+from collections.abc import Sequence, Iterable, Iterator
 from concurrent.futures import ThreadPoolExecutor, Future, as_completed
 
 if sys.version_info >= (3, 11):
@@ -65,7 +63,7 @@ if "REMINDER_SINK_SILENT_FILE" in os.environ:
 silent_file_location = silent_file_location.expanduser().absolute()
 
 
-def silenced_line_is_active(line: str, curtime: int) -> Optional[str]:
+def silenced_line_is_active(line: str, curtime: int) -> str | None:
     """
     parses a line that looks like:
 
@@ -112,7 +110,7 @@ class SilentFile(NamedTuple):
 
     # silenced does not include all lines in the file, just
     # the ones which are active (that have not expired yet)
-    def autoprune(self, *, silenced: List[str]) -> None:
+    def autoprune(self, *, silenced: list[str]) -> None:
         # if there are items in the file that have expired, skip truncating
         if len(silenced) > 0:
             logging.debug(f"{self.file} has active silencers, skipping auto-prune")
@@ -146,7 +144,7 @@ class SilentFile(NamedTuple):
             f.write(f"{name}:{int(time.time() + duration)}\n")
 
     @staticmethod
-    def is_silenced(name: str, *, silenced: List[str]) -> bool:
+    def is_silenced(name: str, *, silenced: list[str]) -> bool:
         import fnmatch
 
         return any(fnmatch.fnmatch(name, active) for active in silenced)
@@ -160,7 +158,7 @@ class Script(NamedTuple):
     def name(self) -> str:
         return self.path.stem
 
-    def detect_shebang(self) -> Optional[str]:
+    def detect_shebang(self) -> str | None:
         with open(self.path) as f:
             first_line = f.readline()
         if first_line.startswith("#!"):
@@ -206,7 +204,7 @@ def script_is_enabled(path: Path) -> bool:
     return path.name.endswith(".enabled") or is_executable(str(path))
 
 
-def find_execs(exclude: List[str]) -> Iterable[Script]:
+def find_execs(exclude: list[str]) -> Iterable[Script]:
     import fnmatch
 
     dirs = os.environ.get("REMINDER_SINK_PATH")
@@ -255,7 +253,7 @@ def run_parallel_scripts(
             yield executor.submit(script.run)
 
 
-def parse_result(res: Result) -> List[str]:
+def parse_result(res: Result) -> list[str]:
     name, exitcode, output = res
     match exitcode:
         case 0:
@@ -276,7 +274,7 @@ def write_results(
     /,
     *,
     files: Sequence[TextIO],
-    silenced: List[str],
+    silenced: list[str],
 ) -> None:
     logging.debug(f"{silenced=}")
     for future in as_completed(futures):
@@ -444,7 +442,7 @@ def run(cpu_count: int, file: TextIO, autoprune: bool, exclude: Sequence[str]) -
     have expired
     """
     sf = SilentFile(silent_file_location)
-    silenced: List[str] = list(sf.load())
+    silenced: list[str] = list(sf.load())
     if autoprune:
         sf.autoprune(silenced=silenced)
 
