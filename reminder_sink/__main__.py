@@ -438,7 +438,7 @@ def run(cpu_count: int, file: TextIO, autoprune: bool, exclude: Sequence[str]) -
     Run all scripts in parallel, print the names of the scripts which
     have expired
     """
-    sf = SilentFile(Path(silent_file_location))
+    sf = SilentFile(silent_file_location)
     silenced: List[str] = list(sf.load())
     if autoprune:
         sf.autoprune(silenced=silenced)
@@ -496,7 +496,7 @@ def _silence_add(duration: int, name: str) -> None:
 
     reminder-sink silence add "$(reminder-sink run | fzf)"
     """
-    sf = SilentFile(Path(silent_file_location))
+    sf = SilentFile(silent_file_location)
     try:
         sf.add_to_file(name=name, duration=duration)
     except ValueError as e:
@@ -509,7 +509,7 @@ def _silence_list() -> None:
     """
     Lists active silenced reminders
     """
-    sf = SilentFile(Path(silent_file_location))
+    sf = SilentFile(silent_file_location)
     for line in sf.load():
         click.echo(line)
 
@@ -555,7 +555,7 @@ def _silence_reset(if_expired: bool) -> None:
     """
     Resets all silenced reminders
     """
-    sf = SilentFile(Path(silent_file_location))
+    sf = SilentFile(silent_file_location)
     if if_expired:
         silenced = list(sf.load())
         sf.autoprune(silenced=silenced)
@@ -569,7 +569,7 @@ def _silence_file() -> None:
     """
     Prints the location of the silenced reminders file
     """
-    click.echo(silent_file_location)
+    click.echo(str(silent_file_location))
 
 
 if __name__ == "__main__":
