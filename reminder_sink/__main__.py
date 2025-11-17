@@ -94,6 +94,9 @@ def silenced_line_is_active(line: str, curtime: int) -> Optional[str]:
 class SilentFile(NamedTuple):
     file: Path
 
+    def __contains__(self, /, name: str) -> bool:
+        return name in self.load()
+
     def load(self) -> Iterator[str]:
         if not self.file.exists():
             logging.debug(f"{self.file} does not exist, skipping SilentFile load")
