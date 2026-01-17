@@ -491,7 +491,6 @@ def _silence() -> None:
     To change the location of the file where this stores silenced reminders,
     you can set the REMINDER_SINK_SILENT_FILE envvar
     """
-    pass
 
 
 @_silence.command(name="add", short_help="silence a reminder")
