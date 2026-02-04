@@ -10,7 +10,6 @@ from typing import (
     NamedTuple,
     Literal,
     get_args,
-    override,
 )
 from collections.abc import Sequence, Iterable, Iterator
 from concurrent.futures import ThreadPoolExecutor, Future, as_completed
@@ -19,6 +18,12 @@ if sys.version_info >= (3, 11):
     from typing import assert_never
 else:
     from typing_extensions import assert_never  # pyright: ignore[reportUnreachable]
+
+if sys.version_info >= (3, 12):
+    from typing import override
+else:
+    from typing_extensions import override  # pyright: ignore[reportUnreachable]
+
 
 import click
 
