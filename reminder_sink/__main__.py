@@ -10,6 +10,7 @@ from typing import (
     NamedTuple,
     Literal,
     get_args,
+    override,
 )
 from collections.abc import Sequence, Iterable, Iterator
 from concurrent.futures import ThreadPoolExecutor, Future, as_completed
@@ -17,7 +18,7 @@ from concurrent.futures import ThreadPoolExecutor, Future, as_completed
 if sys.version_info >= (3, 11):
     from typing import assert_never
 else:
-    from typing_extensions import assert_never
+    from typing_extensions import assert_never  # pyright: ignore[reportUnreachable]
 
 import click
 
@@ -89,6 +90,7 @@ def silenced_line_is_active(line: str, curtime: int) -> tuple[str, datetime] | N
 class SilentFile(NamedTuple):
     file: Path
 
+    @override
     def __contains__(self, /, name: object) -> bool:
         if not isinstance(name, str):
             raise TypeError(f"Expected str, got {type(name).__name__}")
@@ -212,9 +214,9 @@ class Script(NamedTuple):
         )
         return name, exitcode, output
 
-
-def script_is_enabled(path: Path) -> bool:
-    return path.name.endswith(".enabled") or is_executable(str(path))
+    @staticmethod
+    def script_is_enabled(path: Path) -> bool:
+        return path.name.endswith(".enabled") or is_executable(str(path))
 
 
 def find_execs(exclude: list[str]) -> Iterable[Script]:
@@ -224,10 +226,10 @@ def find_execs(exclude: list[str]) -> Iterable[Script]:
     if not dirs:
         click.echo(
             "The REMINDER_SINK_PATH environment variable is not set. "
-            "It should contain a colon-delimited list of directories "
-            "that contain reminder-sink jobs. "
-            "For example, in your shell profile, set:\n"
-            'export REMINDER_SINK_PATH="${HOME}/.local/share/reminder-sink:${HOME}/data/reminder-sink"',
+            + "It should contain a colon-delimited list of directories "
+            + "that contain reminder-sink jobs. "
+            + "For example, in your shell profile, set:\n"
+            + 'export REMINDER_SINK_PATH="${HOME}/.local/share/reminder-sink:${HOME}/data/reminder-sink"',
             err=True,
         )
         return
@@ -248,7 +250,9 @@ def find_execs(exclude: list[str]) -> Iterable[Script]:
                     logging.debug(f"reminder-sink: matched {pattern}, skipping {file}")
                     break
             else:
-                yield Script(path=abspath_f, enabled=script_is_enabled(abspath_f))
+                yield Script(
+                    path=abspath_f, enabled=Script.script_is_enabled(abspath_f)
+                )
 
         logging.debug(f"reminder-sink: finished searching {d}")
 
@@ -344,7 +348,9 @@ OutputFormat = Literal["repr", "path", "json"]
     default=get_args(OutputFormat)[0],
     show_default=True,
 )
-def _list(output_format: OutputFormat, enabled: bool, exclude: Sequence[str]) -> None:
+def _list(  # pyright: ignore[reportUnusedFunction]
+    output_format: OutputFormat, enabled: bool, exclude: Sequence[str]
+) -> None:
     """
     List all scripts found in REMINDER_SINK_PATH
     """
@@ -364,13 +370,13 @@ def _list(output_format: OutputFormat, enabled: bool, exclude: Sequence[str]) ->
 
                 click.echo(json.dumps({"path": str(s.path), "enabled": s.enabled}))
 
-            case format:
-                assert_never(format)
+            case _:
+                assert_never(output_format)
 
 
 @main.command(short_help="test a script", name="test")
 @click.argument("SCRIPT", type=click.Path(exists=True, dir_okay=False))
-def _test(script: str) -> None:
+def _loggertest(script: str) -> None:  # pyright: ignore[reportUnusedFunction]
     """
     Tests a script by running it once and printing the output
     """
@@ -383,7 +389,7 @@ def _test(script: str) -> None:
 
 @main.command(short_help="toggle a script", name="toggle")
 @click.argument("SCRIPT", type=click.Path(exists=True, dir_okay=False))
-def _toggle(script: str) -> None:
+def _toggle(script: str) -> None:  # pyright: ignore[reportUnusedFunction]
     """
     If the script is enabled, disable it, and vice versa
 
@@ -391,7 +397,7 @@ def _toggle(script: str) -> None:
     and toggles executable permissions
     """
     scp = Path(script).absolute()
-    is_enabled = script_is_enabled(scp)
+    is_enabled = Script.script_is_enabled(scp)
 
     sc_str = str(scp)
     if is_enabled:
@@ -449,7 +455,9 @@ def _toggle(script: str) -> None:
     default=False,
     help="automatically remove silenced file if none are active",
 )
-def run(cpu_count: int, file: TextIO, autoprune: bool, exclude: Sequence[str]) -> None:
+def run(
+    cpu_count: int, file: TextIO | None, autoprune: bool, exclude: Sequence[str]
+) -> None:
     """
     Run all scripts in parallel, print the names of the scripts which
     have expired
@@ -502,7 +510,9 @@ def _silence() -> None:
     type=int,
 )
 @click.argument("NAME")
-def _silence_add(duration: int, name: str) -> None:
+def _silence_add(  # pyright: ignore[reportUnusedFunction]
+    duration: int, name: str
+) -> None:
     """
     This allows you to pass a unix-like glob (uses the fnmatch module) for the name
 
@@ -520,7 +530,7 @@ def _silence_add(duration: int, name: str) -> None:
 
 
 @_silence.command(name="list", short_help="list silenced reminders")
-def _silence_list() -> None:
+def _silence_list() -> None:  # pyright: ignore[reportUnusedFunction]
     """
     Lists active silenced reminders
     """
@@ -549,7 +559,7 @@ def get_editor_path() -> str:
 
 
 @_silence.command(name="edit", short_help="edit silenced reminder file")
-def _silence_edit() -> None:
+def _silence_edit() -> None:  # pyright: ignore[reportUnusedFunction]
     """
     Edit the file which contains the silenced reminders in your editor
     """
@@ -566,7 +576,7 @@ def _silence_edit() -> None:
     default=False,
     help="only reset if all silenced reminders have expired",
 )
-def _silence_reset(if_expired: bool) -> None:
+def _silence_reset(if_expired: bool) -> None:  # pyright: ignore[reportUnusedFunction]
     """
     Resets all silenced reminders
     """
@@ -580,7 +590,7 @@ def _silence_reset(if_expired: bool) -> None:
 
 
 @_silence.command(name="file", short_help="print location of silenced reminders file")
-def _silence_file() -> None:
+def _silence_file() -> None:  # pyright: ignore[reportUnusedFunction]
     """
     Prints the location of the silenced reminders file
     """
